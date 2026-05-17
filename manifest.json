@@ -1,0 +1,17 @@
+{
+  "name": "家庭日记",
+  "short_name": "家庭日记",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fbfaf7",
+  "theme_color": "#17212b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

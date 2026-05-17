@@ -1,0 +1,16 @@
+{
+  "name": "family-diary-h5",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "vercel --prod",
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@vercel/blob": "latest"
+  },
+  "devDependencies": {
+    "vercel": "latest"
+  }
+}

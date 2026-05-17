@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#17212b" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="家庭日记" />
+    <title>家庭日记</title>
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" href="./app-icon.svg" />
+    <link rel="stylesheet" href="./styles.css?v=20260517-1" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar app-nav-shell" aria-label="主要导航">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">家</div>
+          <div>
+            <p class="eyebrow">语音日记</p>
+            <h1>家庭日记</h1>
+          </div>
+        </div>
+
+        <section class="member-panel" hidden>
+          <div class="section-label">当前账号</div>
+          <div id="memberList" class="member-list"></div>
+          <button id="addMemberBtn" class="ghost-button" type="button">+ 添加家人</button>
+        </section>
+
+        <nav class="nav-tabs" aria-label="主要功能">
+          <button class="nav-tab active" data-view="journal" type="button">日记</button>
+          <button class="nav-tab" data-view="square" type="button">广场</button>
+          <button class="nav-tab" data-view="calendar" type="button">日历</button>
+          <button class="nav-tab" data-view="feedback" type="button">反馈</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <section class="topbar">
+          <div>
+            <p id="todayLabel" class="eyebrow"></p>
+            <h2 id="viewTitle">今天的日记</h2>
+          </div>
+          <div class="privacy-pill">
+            <span id="activeMemberDot"></span>
+            <span id="activeMemberName"></span>
+          </div>
+        </section>
+
+        <section id="journalView" class="view active-view">
+          <div class="journal-layout">
+            <section class="recording-studio">
+              <div class="studio-header">
+                <div>
+                  <p class="eyebrow">记录此刻</p>
+                  <h3>写下今天</h3>
+                </div>
+                <span id="recordStatus" class="status-chip">准备记录</span>
+              </div>
+
+              <div class="composer">
+                <textarea id="diaryText" rows="8" placeholder="写一点今天发生的事、某个瞬间、孩子的一句话，或者补充语音里没说完的内容。"></textarea>
+                <div class="composer-toolbar">
+                  <div class="composer-record-buttons">
+                    <button id="holdRecordBtn" class="record-icon-button hold" type="button" aria-label="按住录音" title="按住录音">
+                      <span class="mic-glyph" aria-hidden="true"></span>
+                    </button>
+                    <button id="toggleRecordBtn" class="record-icon-button live" type="button" aria-label="连续录音" title="连续录音">
+                      <span class="wave-glyph" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <span id="draftStatus">草稿会自动保存</span>
+                  <button id="clearDraftBtn" class="text-button" type="button">清空</button>
+                </div>
+              </div>
+              <p id="recordHint" class="record-hint" aria-live="polite"></p>
+
+              <div class="context-panel" hidden>
+                <div>
+                  <div class="context-label">当天信息</div>
+                  <div id="dailyContext">正在尝试获取位置和天气。</div>
+                </div>
+                <button id="refreshContextBtn" class="ghost-light-button compact" type="button">刷新</button>
+              </div>
+
+              <div class="media-picker">
+                <button id="pickImageBtn" class="ghost-light-button" type="button">插入图片</button>
+                <button id="takePhotoBtn" class="ghost-light-button" type="button">拍照</button>
+                <input id="imageInput" type="file" accept="image/*" multiple hidden />
+                <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
+              </div>
+              <div id="imagePreview" class="image-preview" aria-live="polite"></div>
+
+              <div class="entry-actions">
+                <label class="share-toggle context-toggle">
+                  <input id="includeContext" type="checkbox" checked />
+                  <span>带上位置天气</span>
+                </label>
+                <label class="share-toggle">
+                  <input id="shareToSquare" type="checkbox" />
+                  <span>分享到日记广场</span>
+                </label>
+                <button id="saveEntryBtn" class="primary-button" type="button">保存今天</button>
+              </div>
+            </section>
+
+            <section class="daily-summary">
+              <div class="section-heading">
+                <h3>今日记录</h3>
+                <span id="entryCount"></span>
+              </div>
+              <article id="mergedToday" class="merged-entry"></article>
+              <div id="todayEntries" class="entry-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="squareView" class="view">
+          <div class="section-heading">
+            <h3>日记广场</h3>
+            <p>家人主动分享的内容会出现在这里。</p>
+          </div>
+          <div id="squareEntries" class="square-grid"></div>
+        </section>
+
+        <section id="calendarView" class="view">
+          <div class="calendar-layout">
+            <section class="calendar-board">
+              <div class="section-heading">
+                <h3>五月日历</h3>
+                <p>有日记的日期会被点亮。</p>
+              </div>
+              <div id="calendarGrid" class="calendar-grid"></div>
+            </section>
+            <section class="calendar-chat">
+              <div class="section-heading">
+                <h3>和全部日记对话</h3>
+                <p>问问你保存过的所有记录。</p>
+              </div>
+              <div id="chatLog" class="chat-log"></div>
+              <div id="quickReplies" class="quick-replies">
+                <button type="button" data-question="总结我的全部日记">全部总结</button>
+                <button type="button" data-question="今天记录了什么？">今天</button>
+                <button type="button" data-question="最近有哪些开心的事？">开心的事</button>
+                <button type="button" data-question="哪些记录有语音或图片？">语音图片</button>
+              </div>
+              <form id="chatForm" class="chat-form">
+                <input id="chatInput" type="text" placeholder="问问全部日记，例如：最近有哪些开心的事？" autocomplete="off" />
+                <button class="primary-button compact" type="submit">发送</button>
+              </form>
+            </section>
+          </div>
+        </section>
+
+        <section id="feedbackView" class="view">
+          <div class="feedback-layout">
+            <section class="feedback-panel">
+              <div class="section-heading">
+                <div>
+                  <h3>问题反馈</h3>
+                  <p>使用中遇到的问题、想要的新功能，都可以从这里提交。</p>
+                </div>
+              </div>
+
+              <form id="feedbackForm" class="feedback-form">
+                <label>
+                  <span>反馈类型</span>
+                  <select id="feedbackType">
+                    <option value="问题">问题</option>
+                    <option value="建议">建议</option>
+                    <option value="体验">体验</option>
+                    <option value="其他">其他</option>
+                  </select>
+                </label>
+                <label>
+                  <span>影响程度</span>
+                  <select id="feedbackPriority">
+                    <option value="影响使用">影响使用</option>
+                    <option value="普通问题">普通问题</option>
+                    <option value="小建议">小建议</option>
+                  </select>
+                </label>
+                <label>
+                  <span>问题描述</span>
+                  <textarea id="feedbackText" rows="6" placeholder="例如：在哪个页面、点了什么、出现了什么问题，或者你希望它怎么工作。"></textarea>
+                </label>
+                <label>
+                  <span>联系方式（可选）</span>
+                  <input id="feedbackContact" type="text" placeholder="微信、手机号或称呼，方便后续追问" />
+                </label>
+                <button class="primary-button" type="submit">提交反馈</button>
+                <p id="feedbackSubmitStatus" class="form-status" aria-live="polite"></p>
+              </form>
+            </section>
+
+            <section class="feedback-panel">
+              <div class="section-heading">
+                <div>
+                  <h3>反馈后台</h3>
+                  <p>这里会自动沉淀家人测试时提交的问题，方便整理下一版。</p>
+                </div>
+                <span id="feedbackCount" class="status-chip">0 条</span>
+              </div>
+              <div id="feedbackList" class="feedback-list"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="memberDialog">
+      <form method="dialog" class="dialog-card">
+        <h3>添加家人账号</h3>
+        <input id="newMemberName" type="text" placeholder="名字" />
+        <div class="color-row" id="colorChoices"></div>
+        <menu>
+          <button value="cancel" class="ghost-button" type="submit">取消</button>
+          <button id="confirmMemberBtn" value="default" class="primary-button compact" type="submit">添加</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <script src="./app.js?v=20260517-1"></script>
+  </body>
+</html>
